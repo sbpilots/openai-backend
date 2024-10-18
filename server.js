@@ -21,6 +21,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     try {
+        // Create a thread using the provided assistant ID
         const threadResponse = await fetch('https://api.openai.com/v1/threads', {
             method: 'POST',
             headers: {
@@ -28,7 +29,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v1'
             },
-            body: JSON.stringify({ assistant: assistantId }) // Use "assistant" instead of "assistant_id"
+            body: JSON.stringify({ assistant_id: assistantId }) // Use "assistant_id" instead of "assistant"
         });
 
         const threadData = await threadResponse.json();
@@ -62,7 +63,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v1'
             },
-            body: JSON.stringify({ assistant: assistantId }) // Use "assistant" instead of "assistant_id"
+            body: JSON.stringify({ assistant_id: assistantId }) // Use "assistant_id" instead of "assistant"
         });
 
         const aiResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
