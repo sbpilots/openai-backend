@@ -15,42 +15,35 @@ app.post('/api/chat', async (req, res) => {
     const userInput = req.body.message;
     const assistantId = req.body.assistantId;
 
-    if (!assistantId) {
-        console.error("No assistant ID provided");
-        return res.status(400).send("Assistant ID is required.");
-    }
-
-    console.log("Assistant ID Provided: ", assistantId);
-
     try {
-        // Create a thread using the provided assistant ID
+        console.log('Assistant ID Provided:', assistantId); // Debug: Log Assistant ID
+        // Step 1: Create a thread
         const threadResponse = await fetch('https://api.openai.com/v1/threads', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v2' // Updated to v2
+                'OpenAI-Beta': 'assistants=v2' // Set correct version as shown by OpenAI
             },
             body: JSON.stringify({ assistant_id: assistantId })
         });
 
         const threadData = await threadResponse.json();
-        console.log("Thread Data:", JSON.stringify(threadData, null, 2)); // Log the entire thread data
+        console.log('Thread Data:', threadData); // Debug: Log Thread Data
 
-        // Check if thread ID exists
         if (!threadData.id) {
-            console.error("No thread ID received. Thread Data:", threadData);
-            throw new Error("Failed to create thread. No thread ID received.");
+            throw new Error('Failed to create thread. No thread ID received.');
         }
 
         const threadId = threadData.id;
 
+        // Step 2: Append user message to the thread
         await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v2' // Updated to v2
+                'OpenAI-Beta': 'assistants=v2' // Ensure all calls have the correct version
             },
             body: JSON.stringify({
                 role: 'user',
@@ -58,27 +51,29 @@ app.post('/api/chat', async (req, res) => {
             })
         });
 
+        // Step 3: Create a run to process the message
         await fetch(`https://api.openai.com/v1/threads/${threadId}/runs`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v2' // Updated to v2
+                'OpenAI-Beta': 'assistants=v2' // Ensure all calls have the correct version
             },
             body: JSON.stringify({ assistant_id: assistantId })
         });
 
+        // Step 4: Get the assistant's response
         const aiResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v2' // Updated to v2
+                'OpenAI-Beta': 'assistants=v2' // Ensure all calls have the correct version
             }
         });
 
         // Step to fetch the AI response
         const aiData = await aiResponse.json();
-        console.log("AI Response Data:", JSON.stringify(aiData, null, 2)); // Log the AI response data
+        console.log('AI Response Data:', aiData); // Debug: Log AI Response Data
 
         let assistantMessage = "No response received from assistant.";
         if (aiData && aiData.messages && aiData.messages.length > 0) {
@@ -86,10 +81,9 @@ app.post('/api/chat', async (req, res) => {
         }
 
         res.json({ response: assistantMessage });
-
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).send(`Error processing request: ${error.message}`);
+        res.status(500).send('Error processing request.');
     }
 });
 
