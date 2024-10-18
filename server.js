@@ -25,7 +25,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v2' // Set correct version as shown by OpenAI
             },
-            body: JSON.stringify({ assistant_id: assistantId })
+            body: JSON.stringify({ assistant: assistantId }) // Updated key name to "assistant"
         });
 
         const threadData = await threadResponse.json();
@@ -59,7 +59,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v2' // Ensure all calls have the correct version
             },
-            body: JSON.stringify({ assistant_id: assistantId })
+            body: JSON.stringify({ assistant: assistantId }) // Updated key name to "assistant"
         });
 
         // Step 4: Get the assistant's response
