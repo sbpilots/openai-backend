@@ -1,10 +1,10 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors'); // Add CORS middleware
+const cors = require('cors'); // Import CORS module
 require('dotenv').config();
 
 const app = express();
-app.use(cors()); // Enable CORS
+app.use(cors()); // Enable CORS middleware
 app.use(express.json());
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
