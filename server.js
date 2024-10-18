@@ -58,16 +58,17 @@ app.post('/api/chat', async (req, res) => {
                 'OpenAI-Beta': 'assistants=v1'
             }
         });
-// Step to fetch the AI response
-const aiData = await aiResponse.json();
+        
+        // Step to fetch the AI response
+        const aiData = await aiResponse.json();
+        console.log("AI Response Data:", aiData); // Add this line to log the response data
 
-let assistantMessage = "No response received from assistant.";
-if (aiData && aiData.messages && aiData.messages.length > 0) {
-    assistantMessage = aiData.messages[aiData.messages.length - 1].content;
-}
+        let assistantMessage = "No response received from assistant.";
+        if (aiData && aiData.messages && aiData.messages.length > 0) {
+            assistantMessage = aiData.messages[aiData.messages.length - 1].content;
+        }
 
-res.json({ response: assistantMessage });
-
+        res.json({ response: assistantMessage });
 
     } catch (error) {
         console.error('Error:', error);
