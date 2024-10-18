@@ -28,7 +28,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v1'
             },
-            body: JSON.stringify({ assistant_id: assistantId })
+            body: JSON.stringify({ assistant: assistantId }) // Use "assistant" instead of "assistant_id"
         });
 
         const threadData = await threadResponse.json();
@@ -62,7 +62,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v1'
             },
-            body: JSON.stringify({ assistant_id: assistantId })
+            body: JSON.stringify({ assistant: assistantId }) // Use "assistant" instead of "assistant_id"
         });
 
         const aiResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
