@@ -1,13 +1,10 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors'); // Include CORS middleware
+const cors = require('cors'); // Add CORS middleware
 require('dotenv').config();
 
 const app = express();
-
-// Enable CORS for all routes
-app.use(cors());
-
+app.use(cors()); // Enable CORS
 app.use(express.json());
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -67,4 +64,11 @@ app.post('/api/chat', async (req, res) => {
 
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).
+        res.status(500).send('Error processing request.');
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
