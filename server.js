@@ -13,7 +13,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 app.post('/api/chat', async (req, res) => {
     const userInput = req.body.message;
-    const assistantId = req.body.assistantId;
+    const assistantId = req.body.assistant; // Updated from assistantId to assistant
 
     try {
         console.log('Assistant ID Provided:', assistantId); // Debug: Log Assistant ID
