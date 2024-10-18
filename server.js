@@ -20,6 +20,8 @@ app.post('/api/chat', async (req, res) => {
         return res.status(400).send("Assistant ID is required.");
     }
 
+    console.log("Assistant ID Provided: ", assistantId);
+
     try {
         // Create a thread using the provided assistant ID
         const threadResponse = await fetch('https://api.openai.com/v1/threads', {
@@ -27,9 +29,9 @@ app.post('/api/chat', async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v1'
+                'OpenAI-Beta': 'assistants=v2' // Updated to v2
             },
-            body: JSON.stringify({ assistant_id: assistantId }) // Use "assistant_id" instead of "assistant"
+            body: JSON.stringify({ assistant_id: assistantId })
         });
 
         const threadData = await threadResponse.json();
@@ -48,7 +50,7 @@ app.post('/api/chat', async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v1'
+                'OpenAI-Beta': 'assistants=v2' // Updated to v2
             },
             body: JSON.stringify({
                 role: 'user',
@@ -61,16 +63,16 @@ app.post('/api/chat', async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v1'
+                'OpenAI-Beta': 'assistants=v2' // Updated to v2
             },
-            body: JSON.stringify({ assistant_id: assistantId }) // Use "assistant_id" instead of "assistant"
+            body: JSON.stringify({ assistant_id: assistantId })
         });
 
         const aiResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'OpenAI-Beta': 'assistants=v1'
+                'OpenAI-Beta': 'assistants=v2' // Updated to v2
             }
         });
 
