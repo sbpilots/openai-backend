@@ -15,6 +15,11 @@ app.post('/api/chat', async (req, res) => {
     const userInput = req.body.message;
     const assistantId = req.body.assistantId;
 
+    if (!assistantId) {
+        console.error("No assistant ID provided");
+        return res.status(400).send("Assistant ID is required.");
+    }
+
     try {
         const threadResponse = await fetch('https://api.openai.com/v1/threads', {
             method: 'POST',
@@ -25,13 +30,13 @@ app.post('/api/chat', async (req, res) => {
             },
             body: JSON.stringify({ assistant_id: assistantId })
         });
-        
-        // Log the response from creating the thread
+
         const threadData = await threadResponse.json();
-        console.log("Thread Data:", threadData); // Log the entire thread data
+        console.log("Thread Data:", JSON.stringify(threadData, null, 2)); // Log the entire thread data
 
         // Check if thread ID exists
         if (!threadData.id) {
+            console.error("No thread ID received. Thread Data:", threadData);
             throw new Error("Failed to create thread. No thread ID received.");
         }
 
@@ -67,10 +72,10 @@ app.post('/api/chat', async (req, res) => {
                 'OpenAI-Beta': 'assistants=v1'
             }
         });
-        
+
         // Step to fetch the AI response
         const aiData = await aiResponse.json();
-        console.log("AI Response Data:", aiData); // Log the AI response data
+        console.log("AI Response Data:", JSON.stringify(aiData, null, 2)); // Log the AI response data
 
         let assistantMessage = "No response received from assistant.";
         if (aiData && aiData.messages && aiData.messages.length > 0) {
