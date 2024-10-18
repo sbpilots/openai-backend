@@ -13,7 +13,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 app.post('/api/chat', async (req, res) => {
     const userInput = req.body.message;
-    const assistantId = req.body.assistant; // Updated from assistantId to assistant
+    const assistantId = req.body.assistant; // Corrected to match front-end key
 
     try {
         console.log('Assistant ID Provided:', assistantId); // Debug: Log Assistant ID
@@ -25,7 +25,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v2' // Set correct version as shown by OpenAI
             },
-            body: JSON.stringify({ assistant: assistantId }) // Updated key name to "assistant"
+            body: JSON.stringify({ assistant: assistantId }) // Ensure this is correct
         });
 
         const threadData = await threadResponse.json();
@@ -59,7 +59,7 @@ app.post('/api/chat', async (req, res) => {
                 'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v2' // Ensure all calls have the correct version
             },
-            body: JSON.stringify({ assistant: assistantId }) // Updated key name to "assistant"
+            body: JSON.stringify({ assistant: assistantId }) // Ensure this matches
         });
 
         // Step 4: Get the assistant's response
