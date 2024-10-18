@@ -25,7 +25,16 @@ app.post('/api/chat', async (req, res) => {
             },
             body: JSON.stringify({ assistant_id: assistantId })
         });
+        
+        // Log the response from creating the thread
         const threadData = await threadResponse.json();
+        console.log("Thread Data:", threadData); // Log the entire thread data
+
+        // Check if thread ID exists
+        if (!threadData.id) {
+            throw new Error("Failed to create thread. No thread ID received.");
+        }
+
         const threadId = threadData.id;
 
         await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
@@ -61,7 +70,7 @@ app.post('/api/chat', async (req, res) => {
         
         // Step to fetch the AI response
         const aiData = await aiResponse.json();
-        console.log("AI Response Data:", aiData); // Add this line to log the response data
+        console.log("AI Response Data:", aiData); // Log the AI response data
 
         let assistantMessage = "No response received from assistant.";
         if (aiData && aiData.messages && aiData.messages.length > 0) {
@@ -72,7 +81,7 @@ app.post('/api/chat', async (req, res) => {
 
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).send('Error processing request.');
+        res.status(500).send(`Error processing request: ${error.message}`);
     }
 });
 
