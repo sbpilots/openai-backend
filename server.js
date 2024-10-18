@@ -7,11 +7,13 @@ app.use(express.json());
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+// POST route to handle chat requests
 app.post('/api/chat', async (req, res) => {
     const userInput = req.body.message;
     const assistantId = req.body.assistantId;
 
     try {
+        // Step 1: Create a thread
         const threadResponse = await fetch('https://api.openai.com/v1/threads', {
             method: 'POST',
             headers: {
@@ -21,10 +23,17 @@ app.post('/api/chat', async (req, res) => {
             },
             body: JSON.stringify({ assistant_id: assistantId })
         });
+
+        // Check for thread creation errors
+        if (!threadResponse.ok) {
+            throw new Error(`Error creating thread: ${threadResponse.statusText}`);
+        }
+
         const threadData = await threadResponse.json();
         const threadId = threadData.id;
 
-        await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
+        // Step 2: Append user message to the thread
+        const messageResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +46,13 @@ app.post('/api/chat', async (req, res) => {
             })
         });
 
-        await fetch(`https://api.openai.com/v1/threads/${threadId}/runs`, {
+        // Check for message append errors
+        if (!messageResponse.ok) {
+            throw new Error(`Error appending message: ${messageResponse.statusText}`);
+        }
+
+        // Step 3: Create a run to get the assistant's response
+        const runResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,6 +62,12 @@ app.post('/api/chat', async (req, res) => {
             body: JSON.stringify({ assistant_id: assistantId })
         });
 
+        // Check for run creation errors
+        if (!runResponse.ok) {
+            throw new Error(`Error creating run: ${runResponse.statusText}`);
+        }
+
+        // Step 4: Fetch the assistant's response
         const aiResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
             method: 'GET',
             headers: {
@@ -54,18 +75,27 @@ app.post('/api/chat', async (req, res) => {
                 'OpenAI-Beta': 'assistants=v1'
             }
         });
+
+        // Check for AI response errors
+        if (!aiResponse.ok) {
+            throw new Error(`Error fetching AI response: ${aiResponse.statusText}`);
+        }
+
         const aiData = await aiResponse.json();
 
-        const assistantMessage = aiData.messages[aiData.messages.length - 1].content;
+        // Get the last message in the thread (assistant's response)
+        const assistantMessage = aiData.messages[aiData.messages.length - 1]?.content;
 
-        res.json({ response: assistantMessage });
+        // Respond with the assistant's message
+        res.json({ response: assistantMessage || "No response from assistant." });
 
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Error processing request.');
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Error processing request. ' + error.message });
     }
 });
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
